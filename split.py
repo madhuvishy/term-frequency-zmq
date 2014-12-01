@@ -1,17 +1,34 @@
 import zmq
 
-context = zmq.Context()
+class Splitter(object):
 
-sender = context.socket(zmq.PUSH)
-sender.bind("tcp://*:5557")
+    def __init__(self):
+        self.context = zmq.Context()
+        self.sender = self.context.socket(zmq.PUSH)
+        self.sink = self.context.socket(zmq.PUSH)
+        self.sender_address = "tcp://*:5557"
+        self.sink_address = "tcp://localhost:5558"
 
-sink = context.socket(zmq.PUSH)
-sink.connect("tcp://localhost:5558")
+    def bind_and_connect(self):
+        self.sender.bind(self.sender_address)
+        self.sink.connect(self.sink_address)
 
-print("Press enter when workers are ready...")
-raw_input()
+    def read_file(self, file_path):
+        with open(file_path) as f:
+            return f.read()
 
-sink.send_string(u'Connecting source and sink')
+    def split(self, line):
+        pass
 
-for i in range(10):
-    sender.send_string(u'%i' % i)
+    def partition(self, file_data):
+        print("Press enter when workers are ready...")
+        raw_input()
+        self.sink.send_string(u'Connecting source and sink')
+        lines = file_data.split("\n")
+        for i in range(len(lines)):
+            print lines[i]
+            self.sender.send_string(u'%s' % lines[i])
+
+splitter = Splitter()
+splitter.bind_and_connect()
+splitter.partition(splitter.read_file("input.txt"))

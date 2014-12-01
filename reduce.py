@@ -1,16 +1,23 @@
 import zmq
 
-context = zmq.Context()
+class Reducer(object):
 
-sink = context.socket(zmq.PULL)
-sink.bind("tcp://*:5558")
+    def __init__(self):
+        self.context = zmq.Context()
+        self.sink = self.context.socket(zmq.PULL)
+        self.sink_address = "tcp://*:5558"
 
-accumalator = []
+    def bind(self):
+        self.sink.bind(self.sink_address)
 
-print sink.recv()
+    def reduce_task(self):
+        accumalator = []
+        print self.sink.recv()
+        for i in range(2):
+            s = self.sink.recv()
+            accumalator.append(s)
+        print accumalator
 
-for i in range(10):
-    s = int(sink.recv())
-    accumalator.append(s)
-
-print reduce(lambda x, y: x+y, accumalator)
+reducer = Reducer()
+reducer.bind()
+reducer.reduce_task()
