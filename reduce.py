@@ -13,7 +13,7 @@ class Reducer(object):
     def reduce_task(self):
         accumalator = []
         print self.sink.recv()
-        for i in range(2):
+        for i in range(int(self.sink.recv())):
             s = self.sink.recv()
             accumalator.append(s)
         print accumalator

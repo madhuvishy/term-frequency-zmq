@@ -25,6 +25,7 @@ class Splitter(object):
         raw_input()
         self.sink.send_string(u'Connecting source and sink')
         lines = file_data.split("\n")
+        self.sender.send_string(u'%i' % len(lines))
         for i in range(len(lines)):
             print lines[i]
             self.sender.send_string(u'%s' % lines[i])
