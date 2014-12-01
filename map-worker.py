@@ -1,4 +1,5 @@
 import zmq
+import pickle
 
 class MapWorker(object):
 
@@ -13,11 +14,16 @@ class MapWorker(object):
         self.source.connect(self.source_address)
         self.sink.connect(self.sink_address)
 
-    def map_task(self):
+    def mapped(self, line):
+        words = line.split(" ")
+        return filter((lambda w : w[0] != ""),
+                      map((lambda w : [w, 1]), words))
+
+    def worker(self):
         while True:
             s = self.source.recv()
-            self.sink.send(s)
-    
+            self.sink.send(pickle.dumps(self.mapped(s)))
+
 map_worker = MapWorker()
 map_worker.connect()
-map_worker.map_task()
+map_worker.worker()
