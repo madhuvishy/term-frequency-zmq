@@ -1,5 +1,4 @@
-import zmq
-import pickle
+import zmq, pickle
 
 class Reducer(object):
 
@@ -13,8 +12,8 @@ class Reducer(object):
 
     def reduce_task(self):
         counts = {}
-        for i in range(int(self.sink.recv())):
-            print counts
+        print self.sink.recv()
+        for i in range(min(int(self.sink.recv()), 200)):
             word_pairs = pickle.loads(self.sink.recv())
             for word, value in word_pairs:
                 if counts.get(word) == None:
@@ -22,7 +21,6 @@ class Reducer(object):
                 else:
                     counts[word] += 1
         print counts
-
 reducer = Reducer()
 reducer.bind()
 reducer.reduce_task()
